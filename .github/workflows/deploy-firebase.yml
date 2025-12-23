@@ -8,6 +8,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./better-gestion
 
     steps:
       - name: Checkout repository
@@ -21,11 +24,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        working-directory: ./better-gestion
 
       - name: Build Angular app
         run: npx ng build --configuration production
-        working-directory: ./better-gestion
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
@@ -36,4 +37,3 @@ jobs:
           projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
-        working-directory: ./better-gestion
