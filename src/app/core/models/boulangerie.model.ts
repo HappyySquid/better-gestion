@@ -21,7 +21,7 @@ export interface CommandeBoulangerie {
 }
 
 export const PRODUITS_BOULANGERIE: ProduitBoulangerie[] = [
-  { id: 'chaussurine', nom: 'Chaussurine', prix: 1.50 },
+  { id: 'champsaurine', nom: 'Champsaurine', prix: 1.50 },
   { id: 'flute-ancienne', nom: 'Flute à l\'ancienne', prix: 1.90 },
   { id: 'pain-cereales', nom: 'Pain aux céréales', prix: 4.00 },
   { id: 'croissant', nom: 'Croissant', prix: 1.50 },

@@ -373,6 +373,17 @@ export class BoulangerieComponent implements OnInit {
     return produit ? produit.prix : 0;
   }
 
+  getProduitEmoji(produitId: string): string {
+    const emojiMap: { [key: string]: string } = {
+      'champsaurine': '🥖',
+      'flute-ancienne': '🍞',
+      'pain-cereales': '🌾',
+      'croissant': '🥐',
+      'pain-chocolat': '🍫'
+    };
+    return emojiMap[produitId] || '🍞';
+  }
+
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('fr-FR');
   }

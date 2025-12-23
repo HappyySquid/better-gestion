@@ -142,22 +142,44 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
-  background: #f7fafc;
-  border-radius: 8px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-radius: 12px;
   border-left: 4px solid #667eea;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .total-label {
-  font-weight: 500;
-  color: #4a5568;
-  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .total-value {
   font-size: 20px;
   font-weight: 700;
   color: #667eea;
+}
+
+.total-value-badge {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 8px 16px;
+  border-radius: 12px;
+  min-width: 50px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .actions-section {
@@ -719,15 +741,47 @@
   align-items: center;
   font-size: 14px;
   color: #4a5568;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #edf2f7;
+  }
+
+  .produit-nom {
+    flex: 1;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
   .quantite {
     color: #718096;
     margin: 0 8px;
   }
 
+  .quantite-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    border-radius: 8px;
+    padding: 4px 12px;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    margin: 0 12px;
+  }
+
   .prix {
     font-weight: 600;
     color: #2d3748;
+    font-size: 15px;
   }
 }
 
@@ -927,24 +981,200 @@
 
 @media (max-width: 768px) {
   .boulangerie-container {
+    padding: 12px;
+  }
+
+  .header-section {
+    margin-bottom: 16px;
+
+    h1 {
+      font-size: 24px;
+    }
+
+    .btn-back {
+      padding: 8px 12px;
+      font-size: 12px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .date-selector-section {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+
+    label {
+      font-size: 13px;
+    }
+
+    .date-navigation {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .totaux-section {
     padding: 16px;
+
+    h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+  }
+
+  .totaux-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .total-item {
+    padding: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .total-value-badge {
+    font-size: 20px;
+    padding: 6px 12px;
+    width: 100%;
+    text-align: center;
   }
 
   .form-row {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .add-form-card {
+    padding: 16px;
+  }
+
+  .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    h2 {
+      font-size: 18px;
+    }
+  }
+
+  .total-commande-display {
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px 16px;
   }
 
   .produit-item {
     grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .produit-quantite-wrapper {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .btn-remove-produit {
+    align-self: center;
+    margin-top: 0;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    h2 {
+      font-size: 20px;
+    }
+  }
+
+  .commande-card {
+    padding: 16px;
   }
 
   .commande-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
+  }
+
+  .commande-info {
+    width: 100%;
+
+    h3 {
+      font-size: 18px;
+    }
+  }
+
+  .commande-total {
+    font-size: 20px;
+    width: 100%;
+    text-align: right;
+  }
+
+  .commande-produits {
+    padding: 10px;
+  }
+
+  .produit-commande {
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .produit-nom {
+      width: 100%;
+      margin-bottom: 4px;
+    }
+
+    .quantite-badge {
+      margin: 0;
+      order: 2;
+    }
+
+    .prix {
+      order: 3;
+      margin-left: auto;
+    }
+  }
+
+  .commande-status {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+
+    .badge {
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   .commande-actions {
     flex-direction: column;
+    width: 100%;
+
+    button {
+      width: 100%;
+      padding: 10px;
+    }
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+    max-width: none;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
   }
 }
 
