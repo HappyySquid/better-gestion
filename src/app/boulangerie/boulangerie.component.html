@@ -188,9 +188,6 @@
         </div>
 
         <div class="commande-status">
-          <span class="badge" [class.paye]="commande.paye" [class.non-paye]="!commande.paye">
-            {{ commande.paye ? '✅ Payé' : '❌ Non payé' }}
-          </span>
           <span class="badge moyen-paiement-badge" *ngIf="commande.paye && commande.moyenPaiement">
             {{ commande.moyenPaiement === 'CB' ? '💳 CB' : '💵 ' + commande.moyenPaiement }}
           </span>
@@ -210,7 +207,15 @@
           <button class="btn-success" (click)="ouvrirModalDonnee(commande)">
             ✅ Donner au client
           </button>
-          <button class="btn-danger" (click)="deleteCommande(commande.id!)">
+          <button class="btn-danger" (click)="ouvrirModalSuppression(commande)">
+            🗑️ Supprimer
+          </button>
+        </div>
+        <div class="commande-actions" *ngIf="commande.donneAuClient">
+          <button class="btn-warning" (click)="ouvrirModalAnnulerDonnee(commande)">
+            ↩️ Annuler "Donné au client"
+          </button>
+          <button class="btn-danger" (click)="ouvrirModalSuppression(commande)">
             🗑️ Supprimer
           </button>
         </div>
@@ -225,8 +230,9 @@
   <!-- Modal pour sélectionner le moyen de paiement -->
   <div class="modal-overlay" *ngIf="showPaiementModal" (click)="fermerModalPaiement()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <h3>Sélectionner le moyen de paiement</h3>
-      <div class="modal-form">
+      <h3 *ngIf="!commandeEnCoursPaiement?.paye">Sélectionner le moyen de paiement</h3>
+      <h3 *ngIf="commandeEnCoursPaiement?.paye">Annuler le paiement</h3>
+      <div class="modal-form" *ngIf="!commandeEnCoursPaiement?.paye">
         <div class="form-group">
           <label for="modalMoyenPaiement">Moyen de paiement *</label>
           <select id="modalMoyenPaiement" [(ngModel)]="selectedMoyenPaiement" class="form-control">
@@ -235,12 +241,15 @@
             <option value="CB">CB</option>
           </select>
         </div>
-        <div class="modal-actions">
-          <button class="btn-secondary" (click)="fermerModalPaiement()">Annuler</button>
-          <button class="btn-primary" (click)="confirmerPaiement()" [disabled]="!selectedMoyenPaiement">
-            Confirmer
-          </button>
-        </div>
+      </div>
+      <p class="modal-message" *ngIf="commandeEnCoursPaiement?.paye">
+        Voulez-vous marquer cette commande comme non payée ?
+      </p>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="fermerModalPaiement()">Annuler</button>
+        <button class="btn-primary" (click)="confirmerPaiement()" [disabled]="!commandeEnCoursPaiement?.paye && !selectedMoyenPaiement">
+          {{ commandeEnCoursPaiement?.paye ? 'Confirmer' : 'Confirmer' }}
+        </button>
       </div>
     </div>
   </div>
@@ -248,7 +257,7 @@
   <!-- Modal pour confirmer "donnée au client" -->
   <div class="modal-overlay" *ngIf="showDonneeModal" (click)="fermerModalDonnee()">
     <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
-      <div class="modal-icon">
+      <div class="modal-icon success">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
           <polyline points="22 4 12 14.01 9 11.01"></polyline>
@@ -262,6 +271,53 @@
         <button class="btn-secondary" (click)="fermerModalDonnee()">Annuler</button>
         <button class="btn-success" (click)="confirmerDonnee()">
           ✓ Confirmer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour supprimer une commande -->
+  <div class="modal-overlay" *ngIf="showSuppressionModal" (click)="fermerModalSuppression()">
+    <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-icon danger">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <h3>Supprimer la commande</h3>
+      <p class="modal-message" *ngIf="commandeEnCoursSuppression">
+        Êtes-vous sûr de vouloir supprimer la commande de <strong>{{ commandeEnCoursSuppression.numAppartement || commandeEnCoursSuppression.nomClient || 'Sans nom' }}</strong> ?<br>
+        <small>Cette action est irréversible.</small>
+      </p>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="fermerModalSuppression()">Annuler</button>
+        <button class="btn-danger" (click)="confirmerSuppression()">
+          🗑️ Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour annuler "donné au client" -->
+  <div class="modal-overlay" *ngIf="showAnnulerDonneeModal" (click)="fermerModalAnnulerDonnee()">
+    <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-icon warning">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <h3>Annuler "Donné au client"</h3>
+      <p class="modal-message" *ngIf="commandeEnCoursAnnulerDonnee">
+        Voulez-vous annuler le statut "Donné au client" pour la commande de <strong>{{ commandeEnCoursAnnulerDonnee.numAppartement || commandeEnCoursAnnulerDonnee.nomClient || 'Sans nom' }}</strong> ?
+      </p>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="fermerModalAnnulerDonnee()">Annuler</button>
+        <button class="btn-warning" (click)="confirmerAnnulerDonnee()">
+          ↩️ Confirmer
         </button>
       </div>
     </div>

@@ -28,6 +28,10 @@ export class BoulangerieComponent implements OnInit {
   selectedMoyenPaiement: string = '';
   showDonneeModal: boolean = false;
   commandeEnCoursDonnee: CommandeBoulangerie | null = null;
+  showSuppressionModal: boolean = false;
+  commandeEnCoursSuppression: CommandeBoulangerie | null = null;
+  showAnnulerDonneeModal: boolean = false;
+  commandeEnCoursAnnulerDonnee: CommandeBoulangerie | null = null;
 
   commandeForm: FormGroup;
 
@@ -313,7 +317,18 @@ export class BoulangerieComponent implements OnInit {
   }
 
   async confirmerPaiement(): Promise<void> {
-    if (!this.commandeEnCoursPaiement?.id || !this.selectedMoyenPaiement) {
+    if (!this.commandeEnCoursPaiement?.id) {
+      return;
+    }
+
+    // Si la commande est déjà payée, on annule le paiement
+    if (this.commandeEnCoursPaiement.paye) {
+      await this.confirmerAnnulerPaiement();
+      return;
+    }
+
+    // Sinon, on demande le moyen de paiement
+    if (!this.selectedMoyenPaiement) {
       this.toastService.error('Veuillez sélectionner un moyen de paiement');
       return;
     }
@@ -335,31 +350,83 @@ export class BoulangerieComponent implements OnInit {
         // Ouvrir la modale pour sélectionner le moyen de paiement
         this.ouvrirModalPaiement(commande);
       } else {
-        // Si on marque comme non payé
-        if (confirm('Marquer cette commande comme non payée ?')) {
-          try {
-            await this.boulangerieService.marquerCommePayee(commande.id, false);
-            this.toastService.success('Commande marquée comme non payée');
-            await this.loadCommandes();
-          } catch (error: any) {
-            console.error('Erreur:', error);
-            this.toastService.error(error.message || 'Erreur lors de la mise à jour');
-          }
-        }
+        // Si on marque comme non payé, ouvrir une modal de confirmation
+        this.ouvrirModalAnnulerPaiement(commande);
       }
     }
   }
 
-  async deleteCommande(commandeId: string): Promise<void> {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette commande ?')) {
-      try {
-        await this.boulangerieService.deleteCommande(commandeId);
-        this.toastService.success('Commande supprimée avec succès');
-        await this.loadCommandes();
-      } catch (error: any) {
-        console.error('Erreur:', error);
-        this.toastService.error(error.message || 'Erreur lors de la suppression');
-      }
+  ouvrirModalSuppression(commande: CommandeBoulangerie): void {
+    this.commandeEnCoursSuppression = commande;
+    this.showSuppressionModal = true;
+  }
+
+  fermerModalSuppression(): void {
+    this.showSuppressionModal = false;
+    this.commandeEnCoursSuppression = null;
+  }
+
+  async confirmerSuppression(): Promise<void> {
+    if (!this.commandeEnCoursSuppression?.id) {
+      return;
+    }
+
+    try {
+      await this.boulangerieService.deleteCommande(this.commandeEnCoursSuppression.id);
+      this.toastService.success('Commande supprimée avec succès');
+      this.fermerModalSuppression();
+      await this.loadCommandes();
+    } catch (error: any) {
+      console.error('Erreur:', error);
+      this.toastService.error(error.message || 'Erreur lors de la suppression');
+    }
+  }
+
+  ouvrirModalAnnulerDonnee(commande: CommandeBoulangerie): void {
+    this.commandeEnCoursAnnulerDonnee = commande;
+    this.showAnnulerDonneeModal = true;
+  }
+
+  fermerModalAnnulerDonnee(): void {
+    this.showAnnulerDonneeModal = false;
+    this.commandeEnCoursAnnulerDonnee = null;
+  }
+
+  async confirmerAnnulerDonnee(): Promise<void> {
+    if (!this.commandeEnCoursAnnulerDonnee?.id) {
+      return;
+    }
+
+    try {
+      await this.boulangerieService.annulerDonnee(this.commandeEnCoursAnnulerDonnee.id);
+      this.toastService.success('Statut "Donné au client" annulé');
+      this.fermerModalAnnulerDonnee();
+      await this.loadCommandes();
+    } catch (error: any) {
+      console.error('Erreur:', error);
+      this.toastService.error(error.message || 'Erreur lors de la mise à jour');
+    }
+  }
+
+  ouvrirModalAnnulerPaiement(commande: CommandeBoulangerie): void {
+    this.commandeEnCoursPaiement = commande;
+    this.selectedMoyenPaiement = '';
+    this.showPaiementModal = true;
+  }
+
+  async confirmerAnnulerPaiement(): Promise<void> {
+    if (!this.commandeEnCoursPaiement?.id) {
+      return;
+    }
+
+    try {
+      await this.boulangerieService.marquerCommePayee(this.commandeEnCoursPaiement.id, false);
+      this.toastService.success('Commande marquée comme non payée');
+      this.fermerModalPaiement();
+      await this.loadCommandes();
+    } catch (error: any) {
+      console.error('Erreur:', error);
+      this.toastService.error(error.message || 'Erreur lors de la mise à jour');
     }
   }
 

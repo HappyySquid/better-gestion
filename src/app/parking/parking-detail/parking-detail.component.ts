@@ -41,6 +41,14 @@ export class ParkingDetailComponent implements OnInit {
   showConfirmModal: boolean = false;
   reservationToConfirm: ParkingClient | null = null;
   confirmReservationForm: FormGroup;
+  
+  // Modal de suppression
+  showSuppressionModal: boolean = false;
+  clientEnCoursSuppression: ParkingClient | null = null;
+  
+  // Modal d'annulation de réservation
+  showAnnulationModal: boolean = false;
+  reservationEnCoursAnnulation: ParkingClient | null = null;
 
   constructor() {
     const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
@@ -247,18 +255,59 @@ export class ParkingDetailComponent implements OnInit {
     }
   }
 
-  async removeClient(clientId: string): Promise<void> {
-    if (confirm('Êtes-vous sûr de vouloir retirer ce client du parking ?')) {
-      this.isLoading = true;
-      try {
-        await this.parkingService.removeClient(clientId);
-        this.toastService.success('Client retiré avec succès');
-        await this.loadData();
-      } catch (error: any) {
-        this.toastService.error(error.message || 'Erreur lors de la suppression');
-      } finally {
-        this.isLoading = false;
-      }
+  ouvrirModalSuppression(client: ParkingClient): void {
+    this.clientEnCoursSuppression = client;
+    this.showSuppressionModal = true;
+  }
+
+  fermerModalSuppression(): void {
+    this.showSuppressionModal = false;
+    this.clientEnCoursSuppression = null;
+  }
+
+  async confirmerSuppression(): Promise<void> {
+    if (!this.clientEnCoursSuppression?.id) {
+      return;
+    }
+
+    this.isLoading = true;
+    try {
+      await this.parkingService.removeClient(this.clientEnCoursSuppression.id);
+      this.toastService.success('Client retiré avec succès');
+      this.fermerModalSuppression();
+      await this.loadData();
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Erreur lors de la suppression');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  ouvrirModalAnnulation(client: ParkingClient): void {
+    this.reservationEnCoursAnnulation = client;
+    this.showAnnulationModal = true;
+  }
+
+  fermerModalAnnulation(): void {
+    this.showAnnulationModal = false;
+    this.reservationEnCoursAnnulation = null;
+  }
+
+  async confirmerAnnulation(): Promise<void> {
+    if (!this.reservationEnCoursAnnulation?.id) {
+      return;
+    }
+
+    this.isLoading = true;
+    try {
+      await this.parkingService.removeClient(this.reservationEnCoursAnnulation.id);
+      this.toastService.success('Réservation annulée avec succès');
+      this.fermerModalAnnulation();
+      await this.loadData();
+    } catch (error: any) {
+      this.toastService.error(error.message || 'Erreur lors de l\'annulation');
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -332,22 +381,6 @@ export class ParkingDetailComponent implements OnInit {
     }
   }
 
-  async annulerReservation(client: ParkingClient): Promise<void> {
-    if (client.id && client.estReservation) {
-      if (confirm(`Annuler la réservation de ${client.nom} ?`)) {
-        this.isLoading = true;
-        try {
-          await this.parkingService.annulerReservation(client.id);
-          this.toastService.success('Réservation annulée');
-          await this.loadData();
-        } catch (error: any) {
-          this.toastService.error(error.message || 'Erreur lors de l\'annulation');
-        } finally {
-          this.isLoading = false;
-        }
-      }
-    }
-  }
 
   onSearchChange(): void {
     this.applyFilters();

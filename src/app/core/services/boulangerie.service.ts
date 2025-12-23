@@ -193,6 +193,13 @@ export class BoulangerieService {
   }
 
   /**
+   * Annule le statut "donné au client"
+   */
+  async annulerDonnee(commandeId: string): Promise<void> {
+    await this.updateCommande(commandeId, { donneAuClient: false });
+  }
+
+  /**
    * Marque une commande comme payée
    */
   async marquerCommePayee(commandeId: string, paye: boolean, moyenPaiement?: string): Promise<void> {

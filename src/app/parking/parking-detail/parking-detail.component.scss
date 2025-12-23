@@ -33,6 +33,8 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
 
     &:hover {
       background: #f7fafc;
@@ -44,6 +46,7 @@
     svg {
       width: 18px;
       height: 18px;
+      flex-shrink: 0;
     }
   }
 }
@@ -57,17 +60,22 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-wrap: wrap;
 
   label {
     font-weight: 500;
     color: #2d3748;
     font-size: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .date-navigation {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex: 1;
+    min-width: 0;
   }
 
   .btn-nav-date {
@@ -76,6 +84,7 @@
     justify-content: center;
     width: 40px;
     height: 40px;
+    min-width: 40px;
     padding: 0;
     background: #f7fafc;
     border: 2px solid #e2e8f0;
@@ -83,6 +92,7 @@
     color: #4a5568;
     cursor: pointer;
     transition: all 0.2s;
+    flex-shrink: 0;
 
     &:hover {
       background: #667eea;
@@ -294,10 +304,14 @@
 
 .search-box {
   flex: 1;
+  min-width: 0;
+  flex: 1;
   min-width: 250px;
 }
 
 .search-input {
+  width: 100%;
+  box-sizing: border-box;
   width: 100%;
   padding: 10px 12px;
   border: 2px solid #e2e8f0;
@@ -692,24 +706,223 @@
   border-radius: 12px;
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+  &.modal-confirm {
+    text-align: center;
+    max-width: 450px;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 20px 0;
+  }
+}
+
+.modal-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+
+  svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  &.success {
+    color: #38a169;
+  }
+
+  &.danger {
+    color: #e53e3e;
+  }
+
+  &.warning {
+    color: #d69e2e;
+  }
+}
+
+.modal-message {
+  color: #4a5568;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+
+  strong {
+    color: #2d3748;
+    font-weight: 600;
+  }
+
+  small {
+    color: #718096;
+    font-size: 13px;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #cbd5e0;
+  }
+}
+
+.btn-warning {
+  padding: 10px 20px;
+  background: #d69e2e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #b7791f;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
 @media (max-width: 768px) {
   .parking-detail-container {
-    padding: 16px;
+    padding: 12px;
+  }
+
+  .header-section {
+    margin-bottom: 20px;
+
+    .header-content {
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    h1 {
+      font-size: 24px;
+      flex: 1;
+      min-width: 0;
+      word-break: break-word;
+    }
+
+    .btn-back {
+      padding: 8px 12px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+  }
+
+  .date-selector-section {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+
+    label {
+      font-size: 13px;
+    }
+
+    .date-navigation {
+      width: 100%;
+    }
+
+    .date-input {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  .filters-section {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-input {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .sort-box {
+    width: 100%;
+  }
+
+  .sort-select {
+    width: 100%;
+    font-size: 14px;
   }
 
   .client-card {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+    padding: 16px;
   }
 
   .client-actions {
     width: 100%;
     justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .form-row {
     grid-template-columns: 1fr;
+  }
+
+  .modal-content {
+    padding: 20px;
+    margin: 10px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
   }
 }
 

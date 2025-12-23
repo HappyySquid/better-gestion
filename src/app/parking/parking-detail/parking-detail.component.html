@@ -166,7 +166,7 @@
           <button class="btn-confirm" (click)="ouvrirModalConfirmation(client)">
             ✓ Confirmer
           </button>
-          <button class="btn-cancel" (click)="annulerReservation(client)">
+          <button class="btn-cancel" (click)="ouvrirModalAnnulation(client)">
             Annuler
           </button>
         </div>
@@ -179,7 +179,7 @@
             (click)="togglePaye(client)">
             {{ client.paye ? '✓ Payé' : 'Non payé' }}
           </button>
-          <button class="btn-danger" (click)="removeClient(client.id!)">Retirer</button>
+          <button class="btn-danger" (click)="ouvrirModalSuppression(client)">Retirer</button>
         </div>
       </div>
     </div>
@@ -236,6 +236,54 @@
         <button class="btn-secondary" (click)="fermerModalConfirmation()">Annuler</button>
         <button class="btn-primary" (click)="confirmerReservation()" [disabled]="isLoading || confirmReservationForm.invalid">
           {{ isLoading ? 'Confirmation...' : 'Confirmer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de suppression -->
+  <div class="modal-overlay" *ngIf="showSuppressionModal" (click)="fermerModalSuppression()">
+    <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-icon danger">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <h3>Retirer le client</h3>
+      <p class="modal-message" *ngIf="clientEnCoursSuppression">
+        Êtes-vous sûr de vouloir retirer <strong>{{ clientEnCoursSuppression.nom }}</strong> du parking ?<br>
+        <small>Cette action est irréversible.</small>
+      </p>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="fermerModalSuppression()">Annuler</button>
+        <button class="btn-danger" (click)="confirmerSuppression()" [disabled]="isLoading">
+          {{ isLoading ? 'Suppression...' : 'Retirer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal d'annulation de réservation -->
+  <div class="modal-overlay" *ngIf="showAnnulationModal" (click)="fermerModalAnnulation()">
+    <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-icon warning">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <h3>Annuler la réservation</h3>
+      <p class="modal-message" *ngIf="reservationEnCoursAnnulation">
+        Voulez-vous annuler la réservation de <strong>{{ reservationEnCoursAnnulation.nom }}</strong> ?<br>
+        <small>Cette action est irréversible.</small>
+      </p>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="fermerModalAnnulation()">Annuler</button>
+        <button class="btn-warning" (click)="confirmerAnnulation()" [disabled]="isLoading">
+          {{ isLoading ? 'Annulation...' : 'Confirmer' }}
         </button>
       </div>
     </div>

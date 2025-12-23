@@ -827,6 +827,11 @@
   background: #e6f3ff;
   color: #2c5282;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
 }
 
 .commande-actions {
@@ -881,6 +886,15 @@
   }
 }
 
+.btn-warning {
+  background: #d69e2e;
+  color: white;
+
+  &:hover {
+    background: #b7791f;
+  }
+}
+
 .empty-state {
   text-align: center;
   padding: 40px;
@@ -931,11 +945,22 @@
   display: flex;
   justify-content: center;
   margin-bottom: 16px;
-  color: #38a169;
 
   svg {
     width: 48px;
     height: 48px;
+  }
+
+  &.success {
+    color: #38a169;
+  }
+
+  &.danger {
+    color: #e53e3e;
+  }
+
+  &.warning {
+    color: #d69e2e;
   }
 }
 
