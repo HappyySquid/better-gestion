@@ -1,0 +1,715 @@
+.parking-detail-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header-section {
+  margin-bottom: 32px;
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0;
+  }
+
+  .btn-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    color: #4a5568;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #f7fafc;
+      border-color: #667eea;
+      color: #667eea;
+      transform: translateX(-2px);
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.date-selector-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  label {
+    font-weight: 500;
+    color: #2d3748;
+    font-size: 14px;
+  }
+
+  .date-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-nav-date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    color: #4a5568;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #667eea;
+      border-color: #667eea;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .date-input {
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: Verdana, sans-serif;
+    color: #2d3748;
+    background: white;
+    transition: all 0.2s;
+    min-width: 160px;
+
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+  }
+}
+
+.stats-section {
+  margin-bottom: 32px;
+}
+
+.stats-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+
+  .stat-item {
+    margin-bottom: 16px;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: #718096;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #667eea;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 16px;
+    background: #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    font-size: 14px;
+    color: #718096;
+    text-align: center;
+  }
+}
+
+.actions-section {
+  margin-bottom: 24px;
+}
+
+.btn-primary {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.add-form-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 24px;
+
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 24px 0;
+  }
+}
+
+.client-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    font-weight: 500;
+    color: #2d3748;
+    font-size: 14px;
+  }
+
+  .form-control {
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+  }
+
+  &.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+  }
+
+  .form-help {
+    font-size: 12px;
+    color: #718096;
+    margin-top: 4px;
+  }
+
+  .required-asterisk {
+    color: #e53e3e;
+    margin-left: 4px;
+  }
+}
+
+.form-error {
+  font-size: 12px;
+  color: #e53e3e;
+  margin-top: 4px;
+}
+
+.filters-section {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+}
+
+.sort-box {
+  min-width: 200px;
+}
+
+.sort-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+}
+
+.clients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.client-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+  border-left: 4px solid transparent;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &.reservation {
+    background: #fff5e6;
+    border-left-color: #f6ad55;
+  }
+}
+
+.client-info {
+  flex: 1;
+
+  .client-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+  }
+
+  .badge-reservation {
+    background: #f6ad55;
+    color: #744210;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .client-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+    color: #4a5568;
+
+    span {
+      display: block;
+    }
+
+    strong {
+      color: #2d3748;
+      margin-right: 8px;
+    }
+  }
+}
+
+.client-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  .reservation-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .client-present-actions {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+.btn-status {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &.paye {
+    background: #c6f6d5;
+    color: #22543d;
+  }
+
+  &.non-paye {
+    background: #fed7d7;
+    color: #c53030;
+  }
+
+  &:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+  }
+}
+
+.btn-danger {
+  padding: 8px 16px;
+  background: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #c53030;
+    transform: translateY(-1px);
+  }
+}
+
+// Modal de confirmation de réservation
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-confirm-reservation {
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #e2e8f0;
+
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2d3748;
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: #718096;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        color: #2d3748;
+        transform: rotate(90deg);
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 24px;
+
+    .modal-message {
+      font-size: 16px;
+      color: #2d3748;
+      margin-bottom: 16px;
+
+      strong {
+        color: #667eea;
+        font-weight: 600;
+      }
+    }
+
+    .modal-info {
+      font-size: 14px;
+      color: #718096;
+      margin-bottom: 20px;
+      padding: 12px;
+      background: #f7fafc;
+      border-radius: 8px;
+      border-left: 3px solid #667eea;
+    }
+
+    .confirm-form {
+      .form-group {
+        margin-bottom: 16px;
+
+        label {
+          display: block;
+          font-size: 14px;
+          font-weight: 500;
+          color: #4a5568;
+          margin-bottom: 8px;
+        }
+
+        .form-control {
+          width: 100%;
+          padding: 10px 12px;
+          border: 2px solid #e2e8f0;
+          border-radius: 8px;
+          font-size: 14px;
+          font-family: Verdana, sans-serif;
+          transition: all 0.2s;
+
+          &:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          }
+        }
+      }
+
+      .form-error {
+        display: block;
+        font-size: 12px;
+        color: #e53e3e;
+        margin-top: 8px;
+      }
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid #e2e8f0;
+
+    .btn-secondary {
+      padding: 10px 20px;
+      background: #f7fafc;
+      color: #4a5568;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #edf2f7;
+        border-color: #cbd5e0;
+      }
+    }
+
+    .btn-primary {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover:not(:disabled) {
+        background: #5568d3;
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+.btn-confirm {
+  padding: 8px 16px;
+  background: #38a169;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #2f855a;
+    transform: translateY(-1px);
+  }
+}
+
+.btn-cancel {
+  padding: 8px 16px;
+  background: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #c53030;
+    transform: translateY(-1px);
+  }
+}
+
+.form-help {
+  font-size: 12px;
+  color: #718096;
+  margin-top: 4px;
+  display: block;
+}
+
+.form-error {
+  font-size: 12px;
+  color: #e53e3e;
+  margin-top: 4px;
+  display: block;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #718096;
+  background: white;
+  border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+  .parking-detail-container {
+    padding: 16px;
+  }
+
+  .client-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .client-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+

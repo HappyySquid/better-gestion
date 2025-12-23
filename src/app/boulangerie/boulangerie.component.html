@@ -1,0 +1,270 @@
+<div class="boulangerie-container">
+  <div class="header-section">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Retour au menu
+      </button>
+      <h1>Gestion Boulangerie</h1>
+    </div>
+  </div>
+
+  <!-- Sélecteur de date -->
+  <div class="date-selector-section">
+    <label for="selectedDate">Date de consultation :</label>
+    <div class="date-navigation">
+      <button class="btn-nav-date" (click)="previousDay()" title="Jour précédent">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <input 
+        id="selectedDate" 
+        type="date" 
+        [(ngModel)]="selectedDate" 
+        (ngModelChange)="onDateChange()"
+        class="date-input"
+      />
+      <button class="btn-nav-date" (click)="nextDay()" title="Jour suivant">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Total par produit -->
+  <div class="totaux-section" *ngIf="getTotalParProduit().length > 0">
+    <h2>Total des commandes par article</h2>
+    <div class="totaux-grid">
+      <div class="total-item" *ngFor="let total of getTotalParProduit()">
+        <span class="total-label">{{ total.nom }}</span>
+        <span class="total-value">{{ total.total }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions-section">
+    <button class="btn-primary" (click)="showAddForm = !showAddForm">
+      {{ showAddForm ? 'Annuler' : '+ Ajouter une commande' }}
+    </button>
+  </div>
+
+  <!-- Formulaire d'ajout -->
+  <div class="add-form-card" *ngIf="showAddForm">
+    <div class="form-header">
+      <h2>Nouvelle commande</h2>
+      <div class="total-commande-display" [class.has-total]="getTotalCommande() > 0">
+        <span class="total-label">Total de la commande:</span>
+        <span class="total-value">{{ formatPrix(getTotalCommande()) }}</span>
+      </div>
+    </div>
+    <form [formGroup]="commandeForm" (ngSubmit)="onSubmit()" class="commande-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="numAppartement">Numéro d'appartement *</label>
+          <input id="numAppartement" type="text" formControlName="numAppartement" class="form-control" placeholder="Ex: A12" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dateCommande">Date de commande *</label>
+          <input id="dateCommande" type="date" formControlName="dateCommande" class="form-control" />
+          <small class="form-help">Par défaut le lendemain (minimum)</small>
+        </div>
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="paye" />
+            <span>Client a payé</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-row" *ngIf="commandeForm.get('paye')?.value">
+        <div class="form-group">
+          <label for="moyenPaiement">Moyen de paiement *</label>
+          <select id="moyenPaiement" formControlName="moyenPaiement" class="form-control">
+            <option value="">Sélectionner un moyen de paiement</option>
+            <option value="Espèces">Espèces</option>
+            <option value="CB">CB</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Produits -->
+      <div class="produits-section">
+        <div class="produits-header">
+          <div>
+            <h3>Produits *</h3>
+            <div class="total-inline" *ngIf="getTotalCommande() > 0">
+              <span class="total-inline-label">Total:</span>
+              <span class="total-inline-value">{{ formatPrix(getTotalCommande()) }}</span>
+            </div>
+          </div>
+          <button type="button" class="btn-add-produit" (click)="addProduit()">+ Ajouter un produit</button>
+        </div>
+        
+        <div formArrayName="produits" class="produits-list">
+          <div *ngFor="let produit of produitsFormArray.controls; let i = index" [formGroupName]="i" class="produit-item">
+            <div class="produit-select-wrapper">
+              <label class="produit-select-label">Produit</label>
+              <select formControlName="produitId" class="produit-select">
+                <option value="">Sélectionner un produit</option>
+                <option *ngFor="let p of produits" [value]="p.id">
+                  {{ p.nom }} - {{ formatPrix(p.prix) }}
+                </option>
+              </select>
+              <div class="produit-prix-display" *ngIf="produit.get('produitId')?.value">
+                <span class="prix-label">Prix unitaire:</span>
+                <span class="prix-value">{{ formatPrix(getProduitPrix(produit.get('produitId')?.value)) }}</span>
+              </div>
+            </div>
+            <div class="produit-quantite-wrapper">
+              <label class="produit-quantite-label">Quantité</label>
+              <div class="quantite-controls">
+                <button type="button" class="btn-quantite" (click)="decrementQuantite(i)" [disabled]="produit.get('quantite')?.value <= 1">
+                  −
+                </button>
+                <input type="number" formControlName="quantite" min="1" class="quantite-input" />
+                <button type="button" class="btn-quantite" (click)="incrementQuantite(i)">
+                  +
+                </button>
+              </div>
+            </div>
+            <button type="button" class="btn-remove-produit" (click)="removeProduit(i)" *ngIf="produitsFormArray.length > 1" title="Supprimer ce produit">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="isLoading || commandeForm.invalid">
+        {{ isLoading ? 'Ajout...' : 'Ajouter la commande' }}
+      </button>
+    </form>
+  </div>
+
+  <!-- Liste des commandes -->
+  <div class="commandes-section">
+    <div class="section-header">
+      <h2>Commandes du {{ getSelectedDateFormatted() }}</h2>
+      <button class="btn-print" (click)="printRecap()" *ngIf="commandesFiltrees.length > 0" title="Imprimer le récapitulatif">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        Imprimer le récapitulatif
+      </button>
+    </div>
+    
+    <div class="commandes-list">
+      <div class="commande-card" 
+           *ngFor="let commande of commandesFiltrees"
+           [class.donnee]="commande.donneAuClient">
+        <div class="commande-header">
+          <div class="commande-info">
+            <h3>{{ commande.numAppartement || commande.nomClient || 'Sans nom' }}</h3>
+            <span class="badge-date">{{ formatDate(commande.dateCommande) }}</span>
+          </div>
+          <div class="commande-total">
+            <strong>{{ formatPrix(commande.total) }}</strong>
+          </div>
+        </div>
+
+        <div class="commande-produits">
+          <div class="produit-commande" *ngFor="let item of commande.produits">
+            <span>{{ getProduitNom(item.produitId) }}</span>
+            <span class="quantite">x{{ item.quantite }}</span>
+            <span class="prix">{{ formatPrix(getProduitPrix(item.produitId) * item.quantite) }}</span>
+          </div>
+        </div>
+
+        <div class="commande-status">
+          <span class="badge" [class.paye]="commande.paye" [class.non-paye]="!commande.paye">
+            {{ commande.paye ? '✓ Payé' : 'Non payé' }}
+          </span>
+          <span class="badge moyen-paiement-badge" *ngIf="commande.paye && commande.moyenPaiement">
+            {{ commande.moyenPaiement }}
+          </span>
+          <span class="badge" [class.donnee]="commande.donneAuClient" *ngIf="commande.donneAuClient">
+            ✓ Donné au client
+          </span>
+        </div>
+
+        <div class="commande-actions" *ngIf="!commande.donneAuClient">
+          <button 
+            class="btn-status" 
+            [class.paye]="commande.paye"
+            [class.non-paye]="!commande.paye"
+            (click)="togglePaye(commande)">
+            {{ commande.paye ? '✓ Payé' : 'Marquer payé' }}
+          </button>
+          <button class="btn-success" (click)="ouvrirModalDonnee(commande)">
+            ✓ Donner au client
+          </button>
+          <button class="btn-danger" (click)="deleteCommande(commande.id!)">
+            Supprimer
+          </button>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="commandesFiltrees.length === 0">
+        <p>Aucune commande pour cette date</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour sélectionner le moyen de paiement -->
+  <div class="modal-overlay" *ngIf="showPaiementModal" (click)="fermerModalPaiement()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>Sélectionner le moyen de paiement</h3>
+      <div class="modal-form">
+        <div class="form-group">
+          <label for="modalMoyenPaiement">Moyen de paiement *</label>
+          <select id="modalMoyenPaiement" [(ngModel)]="selectedMoyenPaiement" class="form-control">
+            <option value="">Sélectionner un moyen de paiement</option>
+            <option value="Espèces">Espèces</option>
+            <option value="CB">CB</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="fermerModalPaiement()">Annuler</button>
+          <button class="btn-primary" (click)="confirmerPaiement()" [disabled]="!selectedMoyenPaiement">
+            Confirmer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour confirmer "donnée au client" -->
+  <div class="modal-overlay" *ngIf="showDonneeModal" (click)="fermerModalDonnee()">
+    <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <h3>Confirmer la distribution</h3>
+      <p class="modal-message" *ngIf="commandeEnCoursDonnee">
+        Voulez-vous marquer la commande de <strong>{{ commandeEnCoursDonnee.numAppartement || commandeEnCoursDonnee.nomClient || 'Sans nom' }}</strong> comme donnée au client ?
+      </p>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="fermerModalDonnee()">Annuler</button>
+        <button class="btn-success" (click)="confirmerDonnee()">
+          ✓ Confirmer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,32 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>Better Gestion</h1>
+      <div class="user-info" *ngIf="user$ | async as user">
+        <span class="user-email">{{ user.email }}</span>
+        <button class="btn-logout" (click)="logout()">Déconnexion</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="welcome-card">
+      <h2>Bienvenue sur Better Gestion</h2>
+      <p>Votre application de gestion pour résidence de tourisme</p>
+      <div class="features-grid">
+        <div class="feature-card" routerLink="/gestion-linge" style="cursor: pointer;">
+          <h3>Gestion du Linge</h3>
+          <p>Gérer le stock et les kits de linge</p>
+        </div>
+        <div class="feature-card" routerLink="/parking" style="cursor: pointer;">
+          <h3>Gestion des Parkings</h3>
+          <p>Gérer les parkings Cimes et Vallon</p>
+        </div>
+        <div class="feature-card" routerLink="/boulangerie" style="cursor: pointer;">
+          <h3>Gestion Boulangerie</h3>
+          <p>Gérer les commandes de boulangerie</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

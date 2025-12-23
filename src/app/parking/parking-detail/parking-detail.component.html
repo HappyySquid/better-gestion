@@ -1,0 +1,243 @@
+<div class="parking-detail-container">
+  <div class="header-section">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/parking">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Retour
+      </button>
+      <h1>Parking {{ batiment }}</h1>
+    </div>
+  </div>
+
+  <!-- Sélecteur de date -->
+  <div class="date-selector-section">
+    <label for="selectedDate">Date de consultation :</label>
+    <div class="date-navigation">
+      <button class="btn-nav-date" (click)="previousDay()" title="Jour précédent">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <input 
+        id="selectedDate" 
+        type="date" 
+        [(ngModel)]="selectedDate" 
+        (ngModelChange)="onDateChange()"
+        class="date-input"
+      />
+      <button class="btn-nav-date" (click)="nextDay()" title="Jour suivant">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-section">
+    <div class="stats-card">
+      <div class="stat-item">
+        <span class="stat-label">Places utilisées</span>
+        <span class="stat-value">{{ stats.placesUtilisees }} / {{ stats.totalPlaces }}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="stats.pourcentageUtilise"></div>
+      </div>
+      <div class="progress-text">{{ stats.pourcentageUtilise }}% utilisé</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions-section">
+    <button class="btn-primary" (click)="showAddForm = !showAddForm">
+      {{ showAddForm ? 'Annuler' : '+ Ajouter un client' }}
+    </button>
+  </div>
+
+  <!-- Formulaire d'ajout -->
+  <div class="add-form-card" *ngIf="showAddForm">
+    <h2>Ajouter un client</h2>
+    <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="client-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nom">Nom du client *</label>
+          <input id="nom" type="text" formControlName="nom" class="form-control" placeholder="Nom du client" />
+        </div>
+        <div class="form-group">
+          <label for="numAppartement">Numéro d'appartement</label>
+          <input id="numAppartement" type="text" formControlName="numAppartement" class="form-control" placeholder="Ex: A12" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="plaqueImmatriculation">
+            Plaque d'immatriculation
+            <span *ngIf="!isReservation()" class="required-asterisk">*</span>
+          </label>
+          <input id="plaqueImmatriculation" type="text" formControlName="plaqueImmatriculation" class="form-control" placeholder="Ex: AB-123-CD" />
+          <small class="form-help" *ngIf="isReservation()">Optionnel pour les réservations (sera demandé à la confirmation)</small>
+        </div>
+        <div class="form-group">
+          <label for="modeleVehicule">
+            Modèle du véhicule
+            <span *ngIf="!isReservation()" class="required-asterisk">*</span>
+          </label>
+          <input id="modeleVehicule" type="text" formControlName="modeleVehicule" class="form-control" placeholder="Ex: Peugeot 208" />
+          <small class="form-help" *ngIf="isReservation()">Optionnel pour les réservations (sera demandé à la confirmation)</small>
+        </div>
+      </div>
+      <small class="form-error" *ngIf="clientForm.errors?.['atLeastOneRequired'] && !isReservation() && clientForm.touched" style="display: block; margin-top: -10px; margin-bottom: 10px;">
+        Au moins la plaque d'immatriculation ou le modèle du véhicule doit être renseigné pour un client présent
+      </small>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dateDebut">Date de début *</label>
+          <input id="dateDebut" type="date" formControlName="dateDebut" class="form-control" />
+          <small class="form-help">Par défaut aujourd'hui. Si future = réservation</small>
+        </div>
+        <div class="form-group">
+          <label for="dateFin">Date de fin *</label>
+          <input id="dateFin" type="date" formControlName="dateFin" class="form-control" />
+          <small class="form-help">Par défaut une semaine plus tard</small>
+        </div>
+      </div>
+
+      <div class="form-row" *ngIf="!isReservation()">
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="paye" />
+            <span>Client a payé</span>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="isLoading || clientForm.invalid">
+        {{ isLoading ? 'Ajout...' : 'Ajouter le client' }}
+      </button>
+    </form>
+  </div>
+
+  <!-- Recherche et tri -->
+  <div class="filters-section">
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (ngModelChange)="onSearchChange()"
+        placeholder="Rechercher par nom, plaque, modèle ou numéro d'appartement..."
+        class="search-input"
+      />
+    </div>
+    <div class="sort-box">
+      <select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()" class="sort-select">
+        <option value="all">Tous les clients</option>
+        <option value="reservation">Réservations</option>
+        <option value="paye">Clients ayant payé</option>
+        <option value="nonPaye">Clients n'ayant pas payé</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Liste des clients -->
+  <div class="clients-list">
+    <div class="client-card" 
+         *ngFor="let client of filteredClients"
+         [class.reservation]="client.estReservation">
+      <div class="client-info">
+        <div class="client-header">
+          <h3>{{ client.nom }}</h3>
+          <span class="badge-reservation" *ngIf="client.estReservation">RÉSERVATION</span>
+        </div>
+        <div class="client-details">
+          <span *ngIf="client.numAppartement"><strong>Appartement:</strong> {{ client.numAppartement }}</span>
+          <span *ngIf="client.plaqueImmatriculation"><strong>Plaque:</strong> {{ client.plaqueImmatriculation }}</span>
+          <span *ngIf="client.modeleVehicule"><strong>Véhicule:</strong> {{ client.modeleVehicule }}</span>
+          <span><strong>Date début:</strong> {{ formatDate(client.dateDebut) }}</span>
+          <span><strong>Date fin:</strong> {{ formatDate(client.dateFin) }}</span>
+        </div>
+      </div>
+      <div class="client-actions">
+        <!-- Actions pour les réservations -->
+        <div *ngIf="client.estReservation" class="reservation-actions">
+          <button class="btn-confirm" (click)="ouvrirModalConfirmation(client)">
+            ✓ Confirmer
+          </button>
+          <button class="btn-cancel" (click)="annulerReservation(client)">
+            Annuler
+          </button>
+        </div>
+        <!-- Actions pour les clients présents -->
+        <div *ngIf="!client.estReservation" class="client-present-actions">
+          <button 
+            class="btn-status" 
+            [class.paye]="client.paye"
+            [class.non-paye]="!client.paye"
+            (click)="togglePaye(client)">
+            {{ client.paye ? '✓ Payé' : 'Non payé' }}
+          </button>
+          <button class="btn-danger" (click)="removeClient(client.id!)">Retirer</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="filteredClients.length === 0">
+      <p>Aucun client trouvé</p>
+    </div>
+  </div>
+
+  <!-- Modal de confirmation de réservation -->
+  <div class="modal-overlay" *ngIf="showConfirmModal" (click)="fermerModalConfirmation()">
+    <div class="modal-content modal-confirm-reservation" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirmer la réservation</h3>
+        <button class="modal-close" (click)="fermerModalConfirmation()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-message" *ngIf="reservationToConfirm">
+          Confirmer la réservation de <strong>{{ reservationToConfirm.nom }}</strong> ?
+        </p>
+        <p class="modal-info">Veuillez renseigner au moins la plaque d'immatriculation ou le modèle du véhicule :</p>
+        <form [formGroup]="confirmReservationForm" class="confirm-form">
+          <div class="form-group">
+            <label for="confirmPlaque">Plaque d'immatriculation</label>
+            <input 
+              id="confirmPlaque" 
+              type="text" 
+              formControlName="plaqueImmatriculation" 
+              class="form-control" 
+              placeholder="Ex: AB-123-CD" 
+            />
+          </div>
+          <div class="form-group">
+            <label for="confirmModele">Modèle du véhicule</label>
+            <input 
+              id="confirmModele" 
+              type="text" 
+              formControlName="modeleVehicule" 
+              class="form-control" 
+              placeholder="Ex: Peugeot 208" 
+            />
+          </div>
+          <small class="form-error" *ngIf="confirmReservationForm.errors?.['atLeastOneRequired'] && confirmReservationForm.touched">
+            Au moins la plaque d'immatriculation ou le modèle du véhicule doit être renseigné
+          </small>
+        </form>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="fermerModalConfirmation()">Annuler</button>
+        <button class="btn-primary" (click)="confirmerReservation()" [disabled]="isLoading || confirmReservationForm.invalid">
+          {{ isLoading ? 'Confirmation...' : 'Confirmer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

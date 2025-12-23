@@ -1,0 +1,81 @@
+<div class="parking-container">
+  <div class="header-section">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Retour au menu
+      </button>
+      <h1>Gestion des Parkings</h1>
+    </div>
+  </div>
+
+  <!-- Sélecteur de date -->
+  <div class="date-selector-section">
+    <label for="selectedDate">Date de consultation :</label>
+    <div class="date-navigation">
+      <button class="btn-nav-date" (click)="previousDay()" title="Jour précédent">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <input 
+        id="selectedDate" 
+        type="date" 
+        [(ngModel)]="selectedDate" 
+        (ngModelChange)="onDateChange()"
+        class="date-input"
+      />
+      <button class="btn-nav-date" (click)="nextDay()" title="Jour suivant">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="batiments-grid" *ngIf="!isLoading">
+    <!-- Bâtiment Cimes -->
+    <div class="batiment-card" (click)="navigateToBatiment('Cimes')">
+      <h2>Cimes</h2>
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-label">Places restantes</span>
+          <span class="stat-value places-restantes">{{ cimesStats.placesRestantes }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Places utilisées</span>
+          <span class="stat-value places-utilisees">{{ cimesStats.placesUtilisees }}</span>
+        </div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="cimesStats.pourcentageUtilise"></div>
+      </div>
+      <div class="progress-text">{{ cimesStats.pourcentageUtilise }}% utilisé</div>
+    </div>
+
+    <!-- Bâtiment Vallon -->
+    <div class="batiment-card" (click)="navigateToBatiment('Vallon')">
+      <h2>Vallon</h2>
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-label">Places restantes</span>
+          <span class="stat-value places-restantes">{{ vallonStats.placesRestantes }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Places utilisées</span>
+          <span class="stat-value places-utilisees">{{ vallonStats.placesUtilisees }}</span>
+        </div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="vallonStats.pourcentageUtilise"></div>
+      </div>
+      <div class="progress-text">{{ vallonStats.pourcentageUtilise }}% utilisé</div>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    <p>Chargement...</p>
+  </div>
+</div>
