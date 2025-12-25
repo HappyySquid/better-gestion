@@ -517,7 +517,7 @@ export class BoulangerieComponent implements OnInit {
   /**
    * Imprime le récapitulatif des commandes du jour
    */
-  printRecap(): void {
+  async printRecap(): Promise<void> {
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
       this.toastService.error('Impossible d\'ouvrir la fenêtre d\'impression');
@@ -530,18 +530,51 @@ export class BoulangerieComponent implements OnInit {
       year: 'numeric'
     });
 
-    // Calculer les totaux
-    let totalCB = 0;
-    let totalEspeces = 0;
+    // Charger tous les appartements pour déterminer les bâtiments
+    const appartements = await new Promise<any[]>((resolve) => {
+      this.appartementService.getAllAppartements().subscribe({
+        next: (apps) => resolve(apps),
+        error: () => resolve([])
+      });
+    });
+
+    // Créer un map pour accéder rapidement au bâtiment par numéro d'appartement
+    const batimentMap = new Map<string, string>();
+    appartements.forEach(app => {
+      if (app.batiment) {
+        batimentMap.set(app.numero.toUpperCase(), app.batiment);
+      }
+    });
+
+    // Calculer les totaux par bâtiment
+    let totalCBCimes = 0;
+    let totalCBVallon = 0;
+    let totalEspecesCimes = 0;
+    let totalEspecesVallon = 0;
     const commandesPayees = this.commandesFiltrees.filter(c => c.paye);
     
     commandesPayees.forEach(commande => {
+      const batiment = commande.numAppartement 
+        ? (batimentMap.get(commande.numAppartement.toUpperCase()) || '')
+        : '';
+      
       if (commande.moyenPaiement === 'CB') {
-        totalCB += commande.total;
+        if (batiment === 'Cimes') {
+          totalCBCimes += commande.total;
+        } else if (batiment === 'Vallon') {
+          totalCBVallon += commande.total;
+        }
       } else if (commande.moyenPaiement === 'Espèces') {
-        totalEspeces += commande.total;
+        if (batiment === 'Cimes') {
+          totalEspecesCimes += commande.total;
+        } else if (batiment === 'Vallon') {
+          totalEspecesVallon += commande.total;
+        }
       }
     });
+
+    const totalCB = totalCBCimes + totalCBVallon;
+    const totalEspeces = totalEspecesCimes + totalEspecesVallon;
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -622,7 +655,6 @@ export class BoulangerieComponent implements OnInit {
         <table>
           <thead>
             <tr>
-              <th>Client</th>
               <th>Appartement</th>
               <th>Contenu</th>
               <th>Total</th>
@@ -638,7 +670,6 @@ export class BoulangerieComponent implements OnInit {
               }).join(', ');
               return `
               <tr>
-                <td>${commande.numAppartement || commande.nomClient || 'Sans nom'}</td>
                 <td>${commande.numAppartement || '-'}</td>
                 <td>${contenu || '-'}</td>
                 <td>${this.formatPrix(commande.total)}</td>
@@ -653,8 +684,24 @@ export class BoulangerieComponent implements OnInit {
         <table>
           <tbody>
             <tr class="total-row">
+              <td><strong>Total CB Cimes</strong></td>
+              <td><strong>${this.formatPrix(totalCBCimes)}</strong></td>
+            </tr>
+            <tr class="total-row">
+              <td><strong>Total CB Vallon</strong></td>
+              <td><strong>${this.formatPrix(totalCBVallon)}</strong></td>
+            </tr>
+            <tr class="total-row">
               <td><strong>Total CB</strong></td>
               <td><strong>${this.formatPrix(totalCB)}</strong></td>
+            </tr>
+            <tr class="total-row">
+              <td><strong>Total Espèces Cimes</strong></td>
+              <td><strong>${this.formatPrix(totalEspecesCimes)}</strong></td>
+            </tr>
+            <tr class="total-row">
+              <td><strong>Total Espèces Vallon</strong></td>
+              <td><strong>${this.formatPrix(totalEspecesVallon)}</strong></td>
             </tr>
             <tr class="total-row">
               <td><strong>Total Espèces</strong></td>

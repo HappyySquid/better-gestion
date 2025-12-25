@@ -32,6 +32,37 @@ export class AppartementService {
   }
 
   /**
+   * Récupère un appartement par son numéro
+   */
+  getAppartementByNumero(numero: string): Observable<Appartement | null> {
+    return new Observable(observer => {
+      runInInjectionContext(this.injector, () => {
+        const appartementsCollection = collection(this.firestore, this.COLLECTION_NAME);
+        const q = query(appartementsCollection, where('numero', '==', numero.trim().toUpperCase()));
+        
+        getDocs(q).then((querySnapshot) => {
+          if (!querySnapshot.empty) {
+            const doc = querySnapshot.docs[0];
+            const data = doc.data();
+            observer.next({
+              id: doc.id,
+              numero: data['numero'] || '',
+              batiment: data['batiment'] || undefined,
+              dateCreation: data['dateCreation']?.toDate() || new Date()
+            } as Appartement);
+          } else {
+            observer.next(null);
+          }
+          observer.complete();
+        }).catch(() => {
+          observer.next(null);
+          observer.complete();
+        });
+      });
+    });
+  }
+
+  /**
    * Récupère tous les appartements
    */
   getAllAppartements(): Observable<Appartement[]> {
