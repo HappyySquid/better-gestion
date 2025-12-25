@@ -46,6 +46,24 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
     
+    // Règles pour la collection appartements
+    match /appartements/{appartementId} {
+      // Permettre la lecture à tous les utilisateurs authentifiés
+      allow read: if request.auth != null;
+      
+      // Permettre l'écriture à tous les utilisateurs authentifiés (pour le développement)
+      allow write: if request.auth != null;
+    }
+    
+    // Règles pour la collection menage
+    match /menage/{menageId} {
+      // Permettre la lecture à tous les utilisateurs authentifiés
+      allow read: if request.auth != null;
+      
+      // Permettre l'écriture à tous les utilisateurs authentifiés (pour le développement)
+      allow write: if request.auth != null;
+    }
+    
     // Vos autres règles...
   }
 }

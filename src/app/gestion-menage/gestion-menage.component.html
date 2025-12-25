@@ -13,8 +13,81 @@
     </div>
   </div>
 
-  <div class="content-section">
-    <p>Page en cours de développement...</p>
+  <!-- Recherche et filtres -->
+  <div class="filters-section">
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (ngModelChange)="onSearchChange()"
+        placeholder="Rechercher un appartement..."
+        class="search-input"
+      />
+    </div>
+    <div class="filter-box">
+      <select [(ngModel)]="filterStatut" (ngModelChange)="onFilterChange()" class="filter-select">
+        <option value="all">Tous les appartements</option>
+        <option value="sale">🔴 Appartements sales</option>
+        <option value="propre">🟠 Appartements propres</option>
+        <option value="verifie">🟢 Appartements vérifiés</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Liste des appartements -->
+  <div class="appartements-grid" *ngIf="!isLoading">
+    <div 
+      class="appartement-card" 
+      *ngFor="let appartement of appartementsFiltres"
+      [class]="'statut-' + appartement.statut"
+      (click)="ouvrirModalChangementStatut(appartement)">
+      <div class="appartement-header">
+        <span class="statut-emoji">{{ getStatutEmoji(appartement.statut) }}</span>
+        <h3>{{ appartement.numero }}</h3>
+      </div>
+      <div class="appartement-info">
+        <span class="batiment-badge" *ngIf="appartement.batiment">{{ appartement.batiment }}</span>
+        <span class="statut-label">{{ getStatutLabel(appartement.statut) }}</span>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="appartementsFiltres.length === 0">
+      <p>Aucun appartement trouvé</p>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Modal de confirmation de changement de statut -->
+  <div class="modal-overlay" *ngIf="showConfirmationModal" (click)="fermerModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="btn-back-modal" (click)="fermerModal()" title="Retour">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <h3>Changer le statut</h3>
+      <div class="modal-body" *ngIf="appartementEnCours && nouveauStatut">
+        <p class="modal-message">
+          Changer le statut de <strong>{{ appartementEnCours.numero }}</strong> de 
+          <span [class]="'statut-badge statut-' + appartementEnCours.statut">
+            {{ getStatutEmoji(appartementEnCours.statut) }} {{ getStatutLabel(appartementEnCours.statut) }}
+          </span>
+          à
+          <span [class]="'statut-badge statut-' + nouveauStatut">
+            {{ getStatutEmoji(nouveauStatut) }} {{ getStatutLabel(nouveauStatut) }}
+          </span> ?
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="fermerModal()">Annuler</button>
+        <button class="btn-primary" (click)="confirmerChangementStatut()" [disabled]="isLoading">
+          Confirmer
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
