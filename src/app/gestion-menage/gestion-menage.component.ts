@@ -33,6 +33,16 @@ export class GestionMenageComponent implements OnInit {
   nouveauStatut: StatutMenage | null = null;
   isLoading: boolean = false;
 
+  // Statistiques par bâtiment
+  statistiquesParBatiment: Array<{
+    batiment: string;
+    total: number;
+    sales: number;
+    propres: number;
+    verifies: number;
+  }> = [];
+  showStats: boolean = false;
+
   async ngOnInit(): Promise<void> {
     await this.loadData();
   }
@@ -58,6 +68,7 @@ export class GestionMenageComponent implements OnInit {
             };
           });
           
+          this.calculerStatistiques();
           this.applyFilters();
           this.isLoading = false;
         },
@@ -163,6 +174,48 @@ export class GestionMenageComponent implements OnInit {
       'verifie': '🟢'
     };
     return emojis[statut];
+  }
+
+  calculerStatistiques(): void {
+    const statsMap = new Map<string, { total: number; sales: number; propres: number; verifies: number }>();
+
+    // Initialiser avec "Tous" pour les statistiques globales
+    statsMap.set('Tous', { total: 0, sales: 0, propres: 0, verifies: 0 });
+
+    this.appartementsAvecStatut.forEach(appart => {
+      const batiment = appart.batiment || 'Sans bâtiment';
+      
+      // Statistiques globales
+      const statsTous = statsMap.get('Tous')!;
+      statsTous.total++;
+      if (appart.statut === 'sale') statsTous.sales++;
+      else if (appart.statut === 'propre') statsTous.propres++;
+      else if (appart.statut === 'verifie') statsTous.verifies++;
+
+      // Statistiques par bâtiment
+      if (!statsMap.has(batiment)) {
+        statsMap.set(batiment, { total: 0, sales: 0, propres: 0, verifies: 0 });
+      }
+      const stats = statsMap.get(batiment)!;
+      stats.total++;
+      if (appart.statut === 'sale') stats.sales++;
+      else if (appart.statut === 'propre') stats.propres++;
+      else if (appart.statut === 'verifie') stats.verifies++;
+    });
+
+    // Convertir en tableau et trier
+    this.statistiquesParBatiment = Array.from(statsMap.entries())
+      .map(([batiment, stats]) => ({ batiment, ...stats }))
+      .sort((a, b) => {
+        // "Tous" en premier, puis par ordre alphabétique
+        if (a.batiment === 'Tous') return -1;
+        if (b.batiment === 'Tous') return 1;
+        return a.batiment.localeCompare(b.batiment, 'fr');
+      });
+  }
+
+  toggleStats(): void {
+    this.showStats = !this.showStats;
   }
 }
 
