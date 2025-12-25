@@ -32,6 +32,8 @@ export class BoulangerieComponent implements OnInit {
   commandeEnCoursSuppression: CommandeBoulangerie | null = null;
   showAnnulerDonneeModal: boolean = false;
   commandeEnCoursAnnulerDonnee: CommandeBoulangerie | null = null;
+  searchTerm: string = '';
+  sortBy: string = 'all'; // 'all', 'nonDonnees', 'nonPayees'
 
   commandeForm: FormGroup;
 
@@ -163,7 +165,7 @@ export class BoulangerieComponent implements OnInit {
     
     console.log('Date sélectionnée pour filtrage:', selectedDateObj.toISOString());
     
-    this.commandesFiltrees = this.commandes.filter(commande => {
+    let filtered = this.commandes.filter(commande => {
       if (!commande.dateCommande) {
         console.log('Commande sans dateCommande:', commande.id);
         return false;
@@ -186,8 +188,42 @@ export class BoulangerieComponent implements OnInit {
       
       return matches;
     });
+
+    // Appliquer le filtre de recherche
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      const searchLower = this.searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(commande => {
+        const appartement = (commande.numAppartement || '').toLowerCase();
+        const nomClient = (commande.nomClient || '').toLowerCase();
+        return appartement.includes(searchLower) || nomClient.includes(searchLower);
+      });
+    }
+
+    // Appliquer le filtre de tri
+    if (this.sortBy === 'nonDonnees') {
+      filtered = filtered.filter(c => !c.donneAuClient);
+    } else if (this.sortBy === 'nonPayees') {
+      filtered = filtered.filter(c => !c.paye);
+    }
+
+    // Trier par ordre alphabétique par défaut
+    filtered.sort((a, b) => {
+      const nomA = (a.numAppartement || a.nomClient || '').toLowerCase();
+      const nomB = (b.numAppartement || b.nomClient || '').toLowerCase();
+      return nomA.localeCompare(nomB, 'fr');
+    });
+    
+    this.commandesFiltrees = filtered;
     
     console.log(`Filtrage: ${this.commandes.length} commandes totales, ${this.commandesFiltrees.length} pour le ${this.selectedDate}`);
+  }
+
+  onSearchChange(): void {
+    this.applyFilters();
+  }
+
+  onSortChange(): void {
+    this.applyFilters();
   }
 
   async onSubmit(): Promise<void> {
@@ -595,19 +631,28 @@ export class BoulangerieComponent implements OnInit {
             <tr>
               <th>Client</th>
               <th>Appartement</th>
+              <th>Contenu</th>
               <th>Total</th>
               <th>Mode de paiement</th>
             </tr>
           </thead>
           <tbody>
-            ${this.commandesFiltrees.map(commande => `
+            ${this.commandesFiltrees.map(commande => {
+              const contenu = commande.produits.map(item => {
+                const produit = this.produits.find(p => p.id === item.produitId);
+                const nomProduit = produit ? produit.nom : item.produitId;
+                return `${item.quantite}x ${nomProduit}`;
+              }).join(', ');
+              return `
               <tr>
                 <td>${commande.numAppartement || commande.nomClient || 'Sans nom'}</td>
                 <td>${commande.numAppartement || '-'}</td>
+                <td>${contenu || '-'}</td>
                 <td>${this.formatPrix(commande.total)}</td>
                 <td class="moyen-paiement">${commande.paye ? (commande.moyenPaiement || 'Non spécifié') : 'Non payé'}</td>
               </tr>
-            `).join('')}
+            `;
+            }).join('')}
           </tbody>
         </table>
 

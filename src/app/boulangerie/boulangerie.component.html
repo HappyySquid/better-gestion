@@ -164,6 +164,26 @@
          Imprimer le récapitulatif
       </button>
     </div>
+
+    <!-- Recherche et tri -->
+    <div class="filters-section">
+      <div class="search-box">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (ngModelChange)="onSearchChange()"
+          placeholder="Rechercher par appartement ou nom..."
+          class="search-input"
+        />
+      </div>
+      <div class="sort-box">
+        <select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()" class="sort-select">
+          <option value="all">Toutes les commandes</option>
+          <option value="nonDonnees">Pas encore données</option>
+          <option value="nonPayees">Pas encore payées</option>
+        </select>
+      </div>
+    </div>
     
     <div class="commandes-list">
       <div class="commande-card" 
@@ -230,8 +250,15 @@
   <!-- Modal pour sélectionner le moyen de paiement -->
   <div class="modal-overlay" *ngIf="showPaiementModal" (click)="fermerModalPaiement()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <h3 *ngIf="!commandeEnCoursPaiement?.paye">Sélectionner le moyen de paiement</h3>
-      <h3 *ngIf="commandeEnCoursPaiement?.paye">Annuler le paiement</h3>
+      <div class="modal-header-with-back">
+        <button class="btn-back-modal" (click)="fermerModalPaiement()" title="Retour">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h3 *ngIf="!commandeEnCoursPaiement?.paye">Sélectionner le moyen de paiement</h3>
+        <h3 *ngIf="commandeEnCoursPaiement?.paye">Annuler le paiement</h3>
+      </div>
       <div class="modal-form" *ngIf="!commandeEnCoursPaiement?.paye">
         <div class="form-group">
           <label for="modalMoyenPaiement">Moyen de paiement *</label>
@@ -257,6 +284,11 @@
   <!-- Modal pour confirmer "donnée au client" -->
   <div class="modal-overlay" *ngIf="showDonneeModal" (click)="fermerModalDonnee()">
     <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
+      <button class="btn-back-modal" (click)="fermerModalDonnee()" title="Retour">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
       <div class="modal-icon success">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -279,6 +311,11 @@
   <!-- Modal pour supprimer une commande -->
   <div class="modal-overlay" *ngIf="showSuppressionModal" (click)="fermerModalSuppression()">
     <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
+      <button class="btn-back-modal" (click)="fermerModalSuppression()" title="Retour">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
       <div class="modal-icon danger">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
@@ -303,6 +340,11 @@
   <!-- Modal pour annuler "donné au client" -->
   <div class="modal-overlay" *ngIf="showAnnulerDonneeModal" (click)="fermerModalAnnulerDonnee()">
     <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
+      <button class="btn-back-modal" (click)="fermerModalAnnulerDonnee()" title="Retour">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
       <div class="modal-icon warning">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>

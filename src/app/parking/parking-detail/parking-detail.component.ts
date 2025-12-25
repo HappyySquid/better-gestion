@@ -434,6 +434,13 @@ export class ParkingDetailComponent implements OnInit {
       filtered = filtered.filter(client => client.estReservation);
     }
 
+    // Trier par ordre alphabétique par défaut
+    filtered.sort((a, b) => {
+      const nomA = (a.nom || '').toLowerCase();
+      const nomB = (b.nom || '').toLowerCase();
+      return nomA.localeCompare(nomB, 'fr');
+    });
+
     this.filteredClients = filtered;
   }
 
