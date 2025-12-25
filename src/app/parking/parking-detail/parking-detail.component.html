@@ -1,12 +1,14 @@
 <div class="parking-detail-container">
   <div class="header-section">
     <div class="header-content">
-      <button class="btn-back" routerLink="/parking">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
-        </svg>
-        Retour
-      </button>
+      <div class="header-top">
+        <button class="btn-back" routerLink="/parking">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Retour
+        </button>
+      </div>
       <h1>Parking {{ batiment }}</h1>
     </div>
   </div>
@@ -68,6 +70,9 @@
         <div class="form-group">
           <label for="numAppartement">Numéro d'appartement</label>
           <input id="numAppartement" type="text" formControlName="numAppartement" class="form-control" placeholder="Ex: A12" />
+          <small class="form-error" *ngIf="clientForm.get('numAppartement')?.hasError('appartementNotFound') && clientForm.get('numAppartement')?.touched">
+            Cet appartement n'existe pas dans la base de données
+          </small>
         </div>
       </div>
 

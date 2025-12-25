@@ -1,10 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, AbstractControl, ValidationErrors, AsyncValidatorFn } from '@angular/forms';
 import { ParkingService } from '../../core/services/parking.service';
+import { AppartementService } from '../../core/services/appartement.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ParkingClient, Batiment, ParkingStats } from '../../core/models/parking.model';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-parking-detail',
@@ -16,6 +19,7 @@ export class ParkingDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private parkingService = inject(ParkingService);
+  private appartementService = inject(AppartementService);
   private toastService = inject(ToastService);
   private fb = inject(FormBuilder);
 
@@ -58,7 +62,7 @@ export class ParkingDetailComponent implements OnInit {
     
     this.clientForm = this.fb.group({
       nom: ['', Validators.required],
-      numAppartement: [''],
+      numAppartement: ['', [], [this.appartementValidator()]],
       plaqueImmatriculation: [''],
       modeleVehicule: [''],
       paye: [false],
@@ -75,6 +79,20 @@ export class ParkingDetailComponent implements OnInit {
     }, {
       validators: this.atLeastOneValidator('plaqueImmatriculation', 'modeleVehicule')
     });
+  }
+
+  appartementValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value || control.value.trim() === '') {
+        return of(null);
+      }
+      return this.appartementService.appartementExists(control.value).pipe(
+        map(exists => {
+          return exists ? null : { appartementNotFound: true };
+        }),
+        catchError(() => of(null))
+      );
+    };
   }
 
   // Validateur personnalisé : au moins un des deux champs doit être rempli
@@ -198,6 +216,13 @@ export class ParkingDetailComponent implements OnInit {
           return;
         }
       }
+    }
+
+    // Vérifier que l'appartement existe si renseigné
+    const numAppartement = (this.clientForm.get('numAppartement')?.value || '').trim();
+    if (numAppartement && this.clientForm.get('numAppartement')?.hasError('appartementNotFound')) {
+      this.toastService.error('Cet appartement n\'existe pas dans la base de données');
+      return;
     }
 
     // Vérifier la validation générale

@@ -1,10 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, FormArray, AbstractControl, ValidationErrors, AsyncValidatorFn } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { BoulangerieService } from '../core/services/boulangerie.service';
 import { ToastService } from '../shared/services/toast.service';
+import { AppartementService } from '../core/services/appartement.service';
 import { CommandeBoulangerie, PRODUITS_BOULANGERIE, ProduitBoulangerie } from '../core/models/boulangerie.model';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-boulangerie',
@@ -14,6 +17,7 @@ import { CommandeBoulangerie, PRODUITS_BOULANGERIE, ProduitBoulangerie } from '.
 })
 export class BoulangerieComponent implements OnInit {
   private boulangerieService = inject(BoulangerieService);
+  private appartementService = inject(AppartementService);
   private fb = inject(FormBuilder);
   private toastService = inject(ToastService);
 
@@ -37,6 +41,21 @@ export class BoulangerieComponent implements OnInit {
 
   commandeForm: FormGroup;
 
+  // Validateur asynchrone pour vérifier que l'appartement existe
+  appartementValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value || control.value.trim() === '') {
+        return of(null);
+      }
+      return this.appartementService.appartementExists(control.value).pipe(
+        map(exists => {
+          return exists ? null : { appartementNotFound: true };
+        }),
+        catchError(() => of(null))
+      );
+    };
+  }
+
   constructor() {
     // Date par défaut : lendemain
     const tomorrow = new Date();
@@ -44,7 +63,7 @@ export class BoulangerieComponent implements OnInit {
     const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
     this.commandeForm = this.fb.group({
-      numAppartement: ['', Validators.required],
+      numAppartement: ['', [Validators.required], [this.appartementValidator()]],
       dateCommande: [tomorrowStr, Validators.required],
       paye: [false],
       moyenPaiement: [''], // Sera requis si paye = true
@@ -116,19 +135,8 @@ export class BoulangerieComponent implements OnInit {
   async loadCommandes(): Promise<void> {
     try {
       this.commandes = await this.boulangerieService.getAllCommandes();
-      console.log('Commandes chargées dans le composant:', this.commandes.length);
-      if (this.commandes.length > 0) {
-        console.log('Première commande:', {
-          numAppartement: this.commandes[0].numAppartement,
-          dateCommande: this.commandes[0].dateCommande.toISOString(),
-          selectedDate: this.selectedDate
-        });
-      }
       this.applyFilters();
-      console.log('Commandes filtrées:', this.commandesFiltrees.length, 'pour la date:', this.selectedDate);
     } catch (error: any) {
-      console.error('Erreur lors du chargement:', error);
-      // Initialiser avec un tableau vide en cas d'erreur
       this.commandes = [];
       this.commandesFiltrees = [];
     }
@@ -163,30 +171,15 @@ export class BoulangerieComponent implements OnInit {
     const selectedDateObj = new Date(year, month - 1, day);
     selectedDateObj.setHours(0, 0, 0, 0);
     
-    console.log('Date sélectionnée pour filtrage:', selectedDateObj.toISOString());
-    
     let filtered = this.commandes.filter(commande => {
       if (!commande.dateCommande) {
-        console.log('Commande sans dateCommande:', commande.id);
         return false;
       }
       
       const commandeDate = new Date(commande.dateCommande);
       commandeDate.setHours(0, 0, 0, 0);
       
-      const matches = commandeDate.getTime() === selectedDateObj.getTime();
-      
-      if (!matches && this.commandes.length <= 5) {
-        // Log détaillé seulement si peu de commandes pour debug
-        console.log('Commande non filtrée:', {
-          numAppartement: commande.numAppartement,
-          commandeDate: commandeDate.toISOString(),
-          selectedDate: selectedDateObj.toISOString(),
-          matches
-        });
-      }
-      
-      return matches;
+      return commandeDate.getTime() === selectedDateObj.getTime();
     });
 
     // Appliquer le filtre de recherche

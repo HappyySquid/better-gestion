@@ -14,21 +14,95 @@
       <h2>👋 Bienvenue sur Better Gestion</h2>
       <p>Votre application de gestion pour résidence de tourisme</p>
       <div class="features-grid">
-        <div class="feature-card" routerLink="/gestion-linge" style="cursor: pointer;">
-          <div class="feature-icon">🧺</div>
-          <h3>Gestion du Linge</h3>
-          <p>Gérer le stock et les kits de linge</p>
+        <!-- Menu pour le rôle Réception (accès à tout) -->
+        <ng-container *ngIf="isReception$ | async">
+          <div class="feature-card" routerLink="/gestion-linge" style="cursor: pointer;">
+            <div class="feature-icon">🧺</div>
+            <h3>Gestion du Linge</h3>
+            <p>Gérer le stock et les kits de linge</p>
+          </div>
+          <div class="feature-card" routerLink="/parking" style="cursor: pointer;">
+            <div class="feature-icon">🚗</div>
+            <h3>Gestion des Parkings</h3>
+            <p>Gérer les parkings Cimes et Vallon</p>
+          </div>
+          <div class="feature-card" routerLink="/boulangerie" style="cursor: pointer;">
+            <div class="feature-icon">🥖</div>
+            <h3>Gestion Boulangerie</h3>
+            <p>Gérer les commandes de boulangerie</p>
+          </div>
+          <div class="feature-card" routerLink="/gestion-menage" style="cursor: pointer;">
+            <div class="feature-icon">🧹</div>
+            <h3>Gestion Ménage</h3>
+            <p>Gérer les tâches de ménage</p>
+          </div>
+        </ng-container>
+        
+        <!-- Menu pour le rôle Ménage (accès uniquement à gestion ménage) -->
+        <ng-container *ngIf="isMenage$ | async">
+          <div class="feature-card" routerLink="/gestion-menage" style="cursor: pointer;">
+            <div class="feature-icon">🧹</div>
+            <h3>Gestion Ménage</h3>
+            <p>Gérer les tâches de ménage</p>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Section temporaire : Gestion des appartements -->
+    <div class="appartements-card" *ngIf="isReception$ | async">
+      <div class="card-header">
+        <h2>🏠 Gestion des Appartements (Temporaire)</h2>
+        <button class="btn-toggle" (click)="showAppartementForm = !showAppartementForm">
+          {{ showAppartementForm ? '❌ Annuler' : '+ Ajouter un appartement' }}
+        </button>
+      </div>
+
+      <!-- Formulaire d'ajout -->
+      <form [formGroup]="appartementForm" (ngSubmit)="addAppartement()" class="appartement-form" *ngIf="showAppartementForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="numero">Numéro d'appartement *</label>
+            <input id="numero" type="text" formControlName="numero" class="form-control" placeholder="Ex: A12, B5" />
+            <small class="form-error" *ngIf="appartementForm.get('numero')?.hasError('required') && appartementForm.get('numero')?.touched">
+              Le numéro est obligatoire
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="batiment">Bâtiment (optionnel)</label>
+            <select id="batiment" formControlName="batiment" class="form-control">
+              <option value="">Aucun</option>
+              <option value="Cimes">Cimes</option>
+              <option value="Vallon">Vallon</option>
+            </select>
+          </div>
         </div>
-        <div class="feature-card" routerLink="/parking" style="cursor: pointer;">
-          <div class="feature-icon">🚗</div>
-          <h3>Gestion des Parkings</h3>
-          <p>Gérer les parkings Cimes et Vallon</p>
+        <button type="submit" class="btn-primary" [disabled]="appartementForm.invalid">
+          Ajouter l'appartement
+        </button>
+      </form>
+
+      <!-- Liste des appartements -->
+      <div class="appartements-list" *ngIf="!isLoadingAppartements">
+        <div class="appartement-item" *ngFor="let appartement of appartements">
+          <div class="appartement-info">
+            <span class="appartement-numero">{{ appartement.numero }}</span>
+            <span class="appartement-batiment" *ngIf="appartement.batiment">{{ appartement.batiment }}</span>
+          </div>
+          <button class="btn-delete" (click)="deleteAppartement(appartement)" title="Supprimer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
-        <div class="feature-card" routerLink="/boulangerie" style="cursor: pointer;">
-          <div class="feature-icon">🥖</div>
-          <h3>Gestion Boulangerie</h3>
-          <p>Gérer les commandes de boulangerie</p>
+        <div class="empty-state" *ngIf="appartements.length === 0">
+          <p>Aucun appartement enregistré</p>
         </div>
+      </div>
+
+      <div class="loading" *ngIf="isLoadingAppartements">
+        <p>Chargement...</p>
       </div>
     </div>
   </main>

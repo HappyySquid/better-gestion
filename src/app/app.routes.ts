@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, loginGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   {
@@ -26,21 +27,26 @@ export const routes: Routes = [
   {
     path: 'gestion-linge',
     loadComponent: () => import('./gestion-linge/gestion-linge.component').then(m => m.GestionLingeComponent),
-    canActivate: [authGuard]
+    canActivate: [authGuard, roleGuard('reception')]
   },
   {
     path: 'parking',
     loadComponent: () => import('./parking/parking.component').then(m => m.ParkingComponent),
-    canActivate: [authGuard]
+    canActivate: [authGuard, roleGuard('reception')]
   },
   {
     path: 'parking/:batiment',
     loadComponent: () => import('./parking/parking-detail/parking-detail.component').then(m => m.ParkingDetailComponent),
-    canActivate: [authGuard]
+    canActivate: [authGuard, roleGuard('reception')]
   },
   {
     path: 'boulangerie',
     loadComponent: () => import('./boulangerie/boulangerie.component').then(m => m.BoulangerieComponent),
+    canActivate: [authGuard, roleGuard('reception')]
+  },
+  {
+    path: 'gestion-menage',
+    loadComponent: () => import('./gestion-menage/gestion-menage.component').then(m => m.GestionMenageComponent),
     canActivate: [authGuard]
   },
   {
